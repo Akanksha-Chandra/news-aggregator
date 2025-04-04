@@ -9,7 +9,9 @@ venv/
 node_modules/
 dist/
 *.log
-it
+Recreate/
+it/
+
 
 # IDE / OS
 .idea/
