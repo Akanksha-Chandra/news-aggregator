@@ -1,0 +1,67 @@
+:root {
+  --primary-bg: #0f1e36; /* Deep blue background */
+  --navbar-bg: rgba(15, 30, 54, 0.9); /* Darker glass effect */
+  --text-color: #ffffff;
+  --accent-color: #00bfff; /* Blue glow */
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: var(--primary-bg); /* Keep the whole page consistent */
+  font-family: sans-serif;
+}
+
+/* Sticky Full-Width Blue Bar */
+.navbar-container {
+  background-color: var(--primary-bg); /* Sticky blue background */
+  width: 100%;
+  height: 80px; /* Adjust as needed */
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 999;
+}
+
+/* Floating Navbar */
+.navbar {
+  background: var(--navbar-bg);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); /* Floating effect */
+  width: 90%;
+  max-width: 1200px;
+  position: relative; /* Keeps it floating inside .navbar-container */
+  margin: auto;
+  top: 15px; /* Centers the floating navbar */
+  backdrop-filter: blur(8px); /* Glass effect */
+}
+
+/* Logo */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+/* Navbar Links */
+.navLinks a {
+  margin-left: 15px;
+  padding: 8px 12px;
+  color: var(--text-color);
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effects */
+.navLinks a:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px var(--accent-color);
+  color: var(--accent-color);
+}

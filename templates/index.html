@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Aggregator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            padding: 20px 0;
+            font-size: 2em;
+        }
+
+        .news-container {
+            width: 90%;
+            margin: auto;
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+        }
+
+        .news-card {
+            flex: 0 0 auto;
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            white-space: normal;
+            transition: transform 0.3s;
+        }
+
+        .news-card:hover {
+            transform: scale(1.05);
+        }
+
+        .news-card img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .news-card h3 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .news-card p {
+            font-size: 14px;
+            color: #ddd;
+        }
+
+        .news-card a {
+            display: inline-block;
+            text-decoration: none;
+            color: #00c3ff;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .scrolling-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .scroll-btn {
+            padding: 10px 15px;
+            border: none;
+            background: #00c3ff;
+            color: white;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .scroll-btn:hover {
+            background: #0096c7;
+        }
+
+        #user-input {
+            width: 50%;
+            padding: 12px;
+            margin: 20px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        #submit-btn {
+            padding: 12px 20px;
+            border: none;
+            background: #00c3ff;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #submit-btn:hover {
+            background: #0096c7;
+        }
+
+        #response {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AI News Aggregator</h1>
+
+    <div class="scrolling-container">
+        <button class="scroll-btn" onclick="scrollLeft()">⬅️</button>
+        <div class="news-container" id="news-container">
+            <p>Loading latest news...</p>
+        </div>
+        <button class="scroll-btn" onclick="scrollRight()">➡️</button>
+    </div>
+
+    <input type="text" id="user-input" placeholder="Ask AI anything...">
+    <button id="submit-btn">Submit</button>
+    <p id="response"></p>
+
+    <script>
+        function fetchNews(query = "") {
+            let url = "/get_news";
+            if (query) url += `?query=${query}`;
+    
+            $.getJSON(url, function(data) {
+                let newsHTML = "";
+                data.forEach(article => {
+                    newsHTML += `
+                        <div class="news-card">
+                            <img src="${article.image}" alt="News Image">
+                            <h3>${article.title}</h3>
+                            <p>${article.summary}</p>
+                            <a href="${article.url}" target="_blank">🔗 Read more</a>
+                        </div>
+                    `;
+                });
+                $("#news-container").html(newsHTML);
+            });
+        }
+    
+        function sendUserInput() {
+            let userText = $("#user-input").val();
+            $.ajax({
+                url: "/process_input",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ user_input: userText }),
+                success: function(response) {
+                    $("#response").html(response.response.replace(/\n/g, "<br>"));  
+                }
+            });
+        }
+    
+        $(document).ready(function() {
+            fetchNews(); 
+            $("#submit-btn").click(sendUserInput);
+        });
+    </script>
+    
+</body>
+</html>

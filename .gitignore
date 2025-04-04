@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+
+# Node.js (if used)
+node_modules/
+dist/
+*.log
+it
+
+# IDE / OS
+.idea/
+.DS_Store
+Thumbs.db
