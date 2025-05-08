@@ -1,0 +1,117 @@
+.chatContainer {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+  color: white;
+}
+
+.chatBox {
+  border: 1px solid #444;
+  padding: 1rem;
+  height: 400px;
+  overflow-y: auto;
+  background-color: #0f1e36;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.message {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+}
+
+.user {
+  background-color: #1f2e50;
+  align-self: flex-end;
+}
+
+.bot {
+  background-color: #2c3e60;
+  align-self: flex-start;
+}
+
+.inputSection {
+  display: flex;
+  gap: 10px;
+}
+
+.inputSection input {
+  flex-grow: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+.inputSection button {
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.loading {
+  font-style: italic;
+  color: #aaa;
+}
+
+.botStructured {
+    margin-top: 10px;
+  }
+  
+  .newsItem {
+    margin: 12px 0;
+    padding: 8px 10px;
+    background-color: #f5f5f5;
+    border-left: 4px solid #007acc;
+    border-radius: 6px;
+  }
+  
+  .newsItem strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1rem;
+    color: #2c3e50;
+  }
+  
+  .newsItem p {
+    margin: 4px 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+  
+  .source {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .intro {
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .chatBox {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  
+  .formattedText {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+  
+  .inputSection textarea {
+    width: 100%;
+    resize: none;
+    font-size: 1rem;
+    padding: 8px;
+  }
+  
+
+  

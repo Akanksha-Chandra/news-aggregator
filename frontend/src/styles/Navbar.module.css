@@ -1,29 +1,28 @@
 :root {
-  --primary-bg: #0f1e36; /* Deep blue background */
-  --navbar-bg: rgba(15, 30, 54, 0.9); /* Darker glass effect */
+  --primary-bg: #0f1e36;
+  --navbar-bg: rgba(15, 30, 54, 0.9);
   --text-color: #ffffff;
-  --accent-color: #00bfff; /* Blue glow */
+  --accent-color: #00bfff;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
-  background-color: var(--primary-bg); /* Keep the whole page consistent */
+  background-color: var(--primary-bg);
   font-family: sans-serif;
 }
 
-/* Sticky Full-Width Blue Bar */
 .navbar-container {
-  background-color: var(--primary-bg); /* Sticky blue background */
+  background-color: var(--primary-bg);
   width: 100%;
-  height: 80px; /* Adjust as needed */
+  height: 80px;
   position: sticky;
   top: 0;
   left: 0;
   z-index: 999;
 }
 
-/* Floating Navbar */
 .navbar {
   background: var(--navbar-bg);
   padding: 10px 20px;
@@ -32,23 +31,26 @@ body, html {
   align-items: center;
   height: 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); /* Floating effect */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
   width: 90%;
   max-width: 1200px;
-  position: relative; /* Keeps it floating inside .navbar-container */
+  position: relative;
   margin: auto;
-  top: 15px; /* Centers the floating navbar */
-  backdrop-filter: blur(8px); /* Glass effect */
+  top: 15px;
+  backdrop-filter: blur(8px);
 }
 
-/* Logo */
 .logo {
   font-size: 20px;
   font-weight: bold;
   color: var(--accent-color);
 }
 
-/* Navbar Links */
+.navLinks {
+  display: flex;
+  align-items: center;
+}
+
 .navLinks a {
   margin-left: 15px;
   padding: 8px 12px;
@@ -59,9 +61,40 @@ body, html {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hover Effects */
 .navLinks a:hover {
   transform: scale(1.1);
   box-shadow: 0 0 10px var(--accent-color);
   color: var(--accent-color);
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.searchBar input {
+  padding: 6px 10px;
+  border-radius: 6px 0 0 6px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background-color: #fff;
+  color: #000;
+  width: 220px;
+}
+
+.searchBar button {
+  padding: 6px 10px;
+  background-color: var(--accent-color);
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.searchBar button:hover {
+  background-color: #0099cc;
 }

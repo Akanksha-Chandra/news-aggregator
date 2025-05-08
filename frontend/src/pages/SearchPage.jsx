@@ -1,29 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "../styles/SearchPage.module.css";
-
-const categories = [
-  ["Society", "Government", "Politics", "Law", "Crime", "Law Enforcement"],
-  ["Business", "Finance", "Economics", "Marketing", "Real Estate"],
-  ["Technology", "Science", "Engineering", "Aviation", "Energy"],
-  ["Sports", "Video Games", "Gaming", "Transportation"],
-  ["Culture", "Fashion", "Lifestyle", "Entertainment", "Television", "Music", "Film"],
-  ["Health", "Healthcare", "Medicine", "Psychology", "Parenting"],
-  ["Environment", "Nature", "Geography", "Animals", "Weather"],
-];
 
 const SearchPage = ({ onSearch, news = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Perform search when component mounts with empty query to show initial results
+  useEffect(() => {
+    if (onSearch && news.length === 0) {
+      onSearch("");
+    }
+  }, [onSearch, news.length]);
 
   const handleSearch = () => {
-    const query = selectedCategory ? `${searchQuery} ${selectedCategory}` : searchQuery;
-    onSearch(query);
-  };
-
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category === selectedCategory ? "" : category);
-    setSearchQuery(""); // Reset search input on category click
-    onSearch(category); // Trigger search based on category
+    if (searchQuery.trim() || searchQuery === "") {
+      setIsLoading(true);
+      onSearch(searchQuery).finally(() => setIsLoading(false));
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -36,52 +30,49 @@ const SearchPage = ({ onSearch, news = [] }) => {
       <div className={styles.searchSection}>
         <input
           type="text"
-          placeholder="Search for news..."
+          placeholder="Search for news by keywords..."
           className={styles.searchInput}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger search on Enter key
+          onKeyDown={handleKeyDown}
         />
-        <button className={styles.searchButton} onClick={handleSearch}>
-          Search
+        <button 
+          className={styles.searchButton} 
+          onClick={handleSearch}
+          disabled={isLoading}
+        >
+          {isLoading ? "Searching..." : "Search"}
         </button>
       </div>
 
-      <h2>Categories</h2>
-      <div className={styles.categories}>
-        {categories.map((row, rowIndex) => (
-          <div key={rowIndex} className={styles.categoryRow}>
-            {row.map((category) => (
-              <button
-                key={category}
-                className={`${styles.categoryButton} ${
-                  selectedCategory === category ? styles.selected : ""
-                }`}
-                onClick={() => handleCategoryClick(category)}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+      <p className={styles.resultsCount}>
+        {news.length > 0 ? `Found ${news.length} results` : "No results found"}
+      </p>
 
       <div className={styles.newsResults}>
-        {news.length > 0 ? (
+        {isLoading ? (
+          <p>Loading results...</p>
+        ) : news.length > 0 ? (
           news.map((article, index) => (
             <div key={index} className={styles.newsCard}>
               {article.image && (
-                <img src={article.image} alt="News" className={styles.newsImage} />
+                <img src={article.image} alt={article.title} className={styles.newsImage} />
               )}
               <h3>{article.title}</h3>
               <p>{article.description}</p>
-              <a href={article.url} target="_blank" rel="noopener noreferrer">
-                Read more
-              </a>
+              {article.id ? (
+                <Link to={`/news/${article.id}`} className={styles.readMoreLink}>
+                  Read more
+                </Link>
+              ) : (
+                <a href={article.url} target="_blank" rel="noopener noreferrer" className={styles.readMoreLink}>
+                  Read more
+                </a>
+              )}
             </div>
           ))
         ) : (
-          <p>No news found. Try searching with a different query or select a category.</p>
+          <p>Try searching for topics like "Technology", "Sports", or "Politics"</p>
         )}
       </div>
     </div>

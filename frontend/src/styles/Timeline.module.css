@@ -1,0 +1,179 @@
+.page {
+    padding: 2rem;
+    color: white;
+  }
+  
+  .searchSection {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .inputGroup {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  
+  .inputGroup input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 8px;
+    border: none;
+  }
+  
+  .inputGroup button {
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .examples {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-top: 1rem;
+  }
+  
+  .timelineWrapper {
+    margin-top: 2rem;
+  }
+  
+  .date {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .summary {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  
+  .sources a {
+    color: var(--accent-color);
+    text-decoration: underline;
+    display: block;
+    margin-top: 5px;
+  }
+  
+  /* Add these styles to your Timeline.module.css file */
+
+.error {
+  color: #ff3333;
+  font-weight: 500;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: rgba(255, 51, 51, 0.1);
+  border-radius: 6px;
+  border-left: 4px solid #ff3333;
+}
+
+.message {
+  color: #2196f3;
+  font-weight: 500;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: rgba(33, 150, 243, 0.1);
+  border-radius: 6px;
+  border-left: 4px solid #2196f3;
+}
+
+.placeholder {
+  text-align: center;
+  padding: 40px;
+  color: #78909c;
+  font-size: 1.1rem;
+  border: 2px dashed #cfd8dc;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.date {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #90caf9;
+}
+
+.summary {
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.sources a {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.sources a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Make sure these existing styles are preserved */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.searchSection {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.inputGroup {
+  display: flex;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.inputGroup input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+}
+
+.inputGroup button {
+  padding: 10px 20px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.inputGroup button:disabled {
+  background-color: #90caf9;
+  cursor: not-allowed;
+}
+
+.examples {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.timelineWrapper {
+  margin-top: 30px;
+}

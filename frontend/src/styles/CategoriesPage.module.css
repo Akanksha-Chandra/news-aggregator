@@ -1,0 +1,220 @@
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .pageTitle {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 2.2rem;
+  }
+  
+  .categoryNavigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+    justify-content: center;
+  }
+  
+  .categoryGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .categoryButton {
+    padding: 12px 24px;
+    background-color: #f2f2f2;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  .categoryButton:hover {
+    background-color: #e9f5ff;
+    border-color: #3498db;
+  }
+  
+  .categoryButton.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+  }
+  
+  .subcategories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    justify-content: center;
+    max-width: 500px;
+  }
+  
+  .subcategoryButton {
+    padding: 6px 12px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    transition: all 0.2s ease;
+  }
+  
+  .subcategoryButton:hover {
+    background-color: #e9f5ff;
+    border-color: #3498db;
+  }
+  
+  .subcategoryButton.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+  }
+  
+  .categoryHeading {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  
+  .newsContent {
+    margin-top: 20px;
+  }
+  
+  .newsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+  }
+  
+  .newsCard {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .newsCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  }
+  
+  .imageContainer {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+  }
+  
+  .newsImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .newsCard:hover .newsImage {
+    transform: scale(1.05);
+  }
+  
+  .newsCardContent {
+    padding: 16px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .newsTitle {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #333;
+    line-height: 1.4;
+  }
+  
+  .newsDate {
+    font-size: 14px;
+    color: #888;
+    margin: 0 0 10px 0;
+  }
+  
+  .newsDescription {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+    flex-grow: 1;
+  }
+  
+  .readMoreLink {
+    display: inline-block;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 5px 0;
+    transition: color 0.2s ease;
+    margin-top: auto;
+  }
+  
+  .readMoreLink:hover {
+    color: #2980b9;
+    text-decoration: underline;
+  }
+  
+  .loadingContainer, 
+  .errorContainer, 
+  .noResults,
+  .instructionsContainer {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    color: #666;
+  }
+  
+  .loadingContainer {
+    background-color: #f0f8ff;
+  }
+  
+  .errorContainer {
+    background-color: #fff0f0;
+    color: #d32f2f;
+  }
+  
+  .noResults {
+    background-color: #fffde7;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .newsGrid {
+      grid-template-columns: 1fr;
+    }
+    
+    .categoryButton {
+      padding: 10px 18px;
+      min-width: 100px;
+      font-size: 15px;
+    }
+    
+    .subcategoryButton {
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+  }
