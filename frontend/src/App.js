@@ -9,16 +9,20 @@ import CategoriesPage from "./pages/CategoriesPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import Timeline from "./pages/Timeline";
 import Chatbot from "./pages/Chatbot";
+import AuthPage from "./pages/AuthPage";
+import ProfilePage from "./pages/ProfilePage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import styles from "./styles/App.module.css";
 
-const App = () => {
+const AppContent = () => {
+  const { getNews } = useAuth();
   const [homeNews, setHomeNews] = useState([]);
   const [searchNews, setSearchNews] = useState([]);
 
   const fetchHomeNews = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/get_news`);
-      const data = await response.json();
+      const data = await getNews();
       setHomeNews(data);
     } catch (error) {
       console.error("Error fetching home news:", error);
@@ -27,8 +31,7 @@ const App = () => {
 
   const fetchSearchNews = async (query = "") => {
     try {
-      const response = await fetch(`http://localhost:5000/get_news?query=${encodeURIComponent(query)}`);
-      const data = await response.json();
+      const data = await getNews(query);
       setSearchNews(data);
     } catch (error) {
       console.error("Error fetching search news:", error);
@@ -40,23 +43,40 @@ const App = () => {
   }, []);
 
   return (
-    <Router>
-      <div className={styles.appContainer}>
-        <Navbar />
-        <main className={styles.mainContent}>
-          <Routes>
-            <Route path="/" element={<HomePage news={homeNews} />} />
-            <Route path="/search" element={<SearchPage onSearch={fetchSearchNews} news={searchNews} />} />
-            <Route path="/news/:id" element={<NewsDetailPage news={homeNews} />} />
-            <Route path="/help" element={<HelpSupportPage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
-            <Route path="/timeline" element={<Timeline />} />
-            <Route path="/ask-newsbot" element={<Chatbot />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <div className={styles.appContainer}>
+      <Navbar />
+      <main className={styles.mainContent}>
+        <Routes>
+          <Route path="/" element={<HomePage news={homeNews} />} />
+          <Route path="/search" element={<SearchPage onSearch={fetchSearchNews} news={searchNews} />} />
+          <Route path="/news/:id" element={<NewsDetailPage news={homeNews} />} />
+          <Route path="/help" element={<HelpSupportPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/timeline" element={<Timeline />} />
+          <Route path="/ask-newsbot" element={<Chatbot />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 };
 

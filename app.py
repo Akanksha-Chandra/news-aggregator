@@ -5,10 +5,14 @@ import traceback
 import json
 import requests
 import os
-import traceback  # Add this import for error handling
+import uuid
+from db import users_collection, chat_collection, search_logs
+import traceback
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import json
+import bcrypt
+import jwt
 
 # Load environment variables
 load_dotenv()
@@ -20,6 +24,8 @@ CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
 # API keys
 GNEWS_API_KEY = os.getenv("GNEWS_API_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-for-jwt-generation")
+JWT_EXPIRATION = 24  # hours
 
 if not GNEWS_API_KEY:
     raise ValueError("GNEWS_API_KEY is missing in .env")
@@ -45,6 +51,307 @@ CATEGORIES = {
     "business": ["business", "finance", "economy", "market"],
     "entertainment": ["movies", "music", "celebrity", "tv"]
 }
+
+# Authentication middleware
+def token_required(f):
+    def decorated(*args, **kwargs):
+        token = None
+        auth_header = request.headers.get('Authorization')
+        
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            
+        if not token:
+            return jsonify({'error': 'Authentication token is missing'}), 401
+            
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            request.user = payload
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Invalid token'}), 401
+            
+        return f(*args, **kwargs)
+    
+    decorated.__name__ = f.__name__
+    return decorated
+
+@app.route("/register", methods=["POST"])
+def register_user():
+    data = request.json
+    email = data.get("email")
+    name = data.get("name")
+    password = data.get("password")
+    
+    if not email or not name or not password:
+        return jsonify({"error": "Email, name, and password are required"}), 400
+    
+    try:
+        existing_user = users_collection.find_one({"email": email})
+        if existing_user:
+            return jsonify({"error": "User already exists"}), 409
+        
+        # Hash the password before storing
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        new_user = {
+            "email": email,
+            "name": name,
+            "password": hashed_password,
+            "preferences": data.get("preferences", []),
+            "created_at": datetime.utcnow()
+        }
+        
+        result = users_collection.insert_one(new_user)
+        
+        # Create a user object without sensitive data
+        user_to_return = {
+            "_id": str(result.inserted_id),
+            "email": email,
+            "name": name,
+            "preferences": data.get("preferences", [])
+        }
+        
+        # Generate JWT token
+        token = jwt.encode(
+            {
+                "user_id": str(result.inserted_id),
+                "email": email,
+                "exp": datetime.utcnow() + timedelta(hours=JWT_EXPIRATION)
+            },
+            SECRET_KEY,
+            algorithm="HS256"
+        )
+        
+        return jsonify({
+            "message": "User registered successfully",
+            "user": user_to_return,
+            "token": token
+        }), 201
+        
+    except Exception as e:
+        print(f"Registration error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": "Registration failed"}), 500
+
+@app.route("/login", methods=["POST"])
+def login_or_signup_user():
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+    name = data.get("name", email.split("@")[0])  # Fallback name if not provided
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    try:
+        user = users_collection.find_one({"email": email})
+
+        # Case 1: User exists → Try logging in
+        if user:
+            if bcrypt.checkpw(password.encode('utf-8'), user["password"]):
+                user_to_return = {
+                    "_id": str(user["_id"]),
+                    "email": user["email"],
+                    "name": user["name"],
+                    "preferences": user.get("preferences", [])
+                }
+
+                token = jwt.encode(
+                    {
+                        "user_id": str(user["_id"]),
+                        "email": user["email"],
+                        "exp": datetime.utcnow() + timedelta(hours=JWT_EXPIRATION)
+                    },
+                    SECRET_KEY,
+                    algorithm="HS256"
+                )
+
+                return jsonify({
+                    "message": "Login successful",
+                    "user": user_to_return,
+                    "token": token
+                }), 200
+            else:
+                return jsonify({"error": "Invalid password"}), 401
+
+        # Case 2: User doesn't exist → Register new user
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        new_user = {
+            "email": email,
+            "name": name,
+            "password": hashed_password,
+            "preferences": [],
+            "created_at": datetime.utcnow()
+        }
+
+        result = users_collection.insert_one(new_user)
+
+        user_to_return = {
+            "_id": str(result.inserted_id),
+            "email": email,
+            "name": name,
+            "preferences": []
+        }
+
+        token = jwt.encode(
+            {
+                "user_id": str(result.inserted_id),
+                "email": email,
+                "exp": datetime.utcnow() + timedelta(hours=JWT_EXPIRATION)
+            },
+            SECRET_KEY,
+            algorithm="HS256"
+        )
+
+        return jsonify({
+            "message": "User created and logged in",
+            "user": user_to_return,
+            "token": token
+        }), 201
+
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": f"Login/Signup failed: {str(e)}"}), 500
+
+
+@app.route("/user", methods=["GET"])
+@token_required
+def get_user():
+    email = request.user["email"]  # Get email from JWT token
+    
+    try:
+        user = users_collection.find_one({"email": email})
+        if user:
+            # Return user without password
+            user_to_return = {
+                "_id": str(user["_id"]),
+                "email": user["email"],
+                "name": user["name"],
+                "preferences": user.get("preferences", []),
+                "created_at": user.get("created_at").isoformat() if user.get("created_at") else None
+            }
+            return jsonify(user_to_return), 200
+        return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Failed to fetch user"}), 500
+
+@app.route("/update_preferences", methods=["POST"])
+@token_required
+def update_preferences():
+    data = request.json
+    email = request.user["email"]  # Get email from JWT token
+    preferences = data.get("preferences")
+    
+    if preferences is None:
+        return jsonify({"error": "Preferences are required"}), 400
+    
+    try:
+        result = users_collection.update_one(
+            {"email": email},
+            {"$set": {"preferences": preferences}}
+        )
+        
+        if result.matched_count:
+            return jsonify({"message": "Preferences updated"}), 200
+        return jsonify({"error": "User not found"}), 404
+        
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Update failed"}), 500
+
+@app.route("/save_chat", methods=["POST"])
+@token_required
+def save_chat():
+    try:
+        data = request.json
+        session_id = data.get("session_id", str(uuid.uuid4()))
+        user_email = request.user["email"]  # Get email from JWT token
+        question = data.get("question")
+        answer = data.get("answer")
+        
+        if not question or not answer:
+            return jsonify({"error": "Question and answer are required"}), 400
+        
+        chat_doc = {
+            "session_id": session_id,
+            "email": user_email,
+            "question": question,
+            "answer": answer,
+            "timestamp": datetime.utcnow()
+        }
+        chat_collection.insert_one(chat_doc)
+        return jsonify({"message": "Chat saved", "session_id": session_id}), 201
+        
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Failed to save chat"}), 500
+
+@app.route("/chat_history", methods=["GET"])
+@token_required
+def chat_history():
+    email = request.user["email"]  # Get email from JWT token
+    session_id = request.args.get("session_id")
+    
+    try:
+        query = {"email": email}
+        if session_id:
+            query["session_id"] = session_id
+            
+        chats = list(chat_collection.find(query).sort("timestamp", 1))
+        for chat in chats:
+            chat["_id"] = str(chat["_id"])
+            if isinstance(chat.get("timestamp"), datetime):
+                chat["timestamp"] = chat["timestamp"].isoformat()
+                
+        return jsonify(chats), 200
+        
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Failed to fetch chat history"}), 500
+
+@app.route("/log_search", methods=["POST"])
+@token_required
+def log_search():
+    data = request.json
+    email = request.user["email"]  # Get email from JWT token
+    query = data.get("query")
+    
+    if not query:
+        return jsonify({"error": "Query is required"}), 400
+        
+    try:
+        log_entry = {
+            "email": email,
+            "query": query,
+            "timestamp": datetime.utcnow()
+        }
+        search_logs.insert_one(log_entry)
+        return jsonify({"message": "Search logged"}), 201
+        
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Failed to log search"}), 500
+
+@app.route("/search_history", methods=["GET"])
+@token_required
+def get_search_history():
+    email = request.user["email"]  # Get email from JWT token
+    
+    try:
+        history = list(search_logs.find({"email": email}).sort("timestamp", -1))
+        for entry in history:
+            entry["_id"] = str(entry["_id"])
+            if isinstance(entry.get("timestamp"), datetime):
+                entry["timestamp"] = entry["timestamp"].isoformat()
+                
+        return jsonify(history), 200
+        
+    except Exception as e:
+        print(traceback.format_exc())
+        return jsonify({"error": "Failed to fetch search history"}), 500
 
 def fetch_news(query=None):
     try:
@@ -301,8 +608,8 @@ def ask_groq_llm(prompt):
         print(f"Response content: {getattr(response, 'text', 'No response content')}")
         return f"I encountered an issue while processing your request. Error: {str(e)}"
     
-
 @app.route("/ask_newsbot", methods=["POST", "OPTIONS"])
+@token_required
 def ask_newsbot():
     # Handle preflight OPTIONS request
     if request.method == "OPTIONS":

@@ -1,17 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; 
+import { useAuth } from "../context/AuthContext.jsx";
 import styles from "../styles/Navbar.module.css";
 
 const Navbar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
-  };
 
   return (
     <div className={styles["navbar-container"]}>
@@ -27,7 +20,20 @@ const Navbar = () => {
           <Link to="/categories">🗂️ Categories</Link>
           <Link to="/timeline">🧠 Timeline</Link>
           <Link to="/ask-newsbot">💬 Ask NewsBot</Link>
-          <Link to="/search">🔍 Search</Link>
+          <Link to="/help">❓ Help</Link>
+        </div>
+
+        {/* Auth Section */}
+        <div className={styles.authSection}>
+          {isAuthenticated ? (
+            <>
+              <span className={styles.username}>Hi, {user?.username}</span>
+              <Link to="/profile" className={styles.profileLink}>Profile</Link>
+              <button onClick={logout} className={styles.authButton}>Logout</button>
+            </>
+          ) : (
+            <Link to="/auth" className={styles.authButton}>Login / Signup</Link>
+          )}
         </div>
       </nav>
     </div>
